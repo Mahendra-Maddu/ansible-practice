@@ -1,0 +1,32 @@
+---
+- name: p1
+  hosts: localhost
+  collections:
+    - community.aws
+  gather_facts: false  # Avoid gathering facts if not needed
+
+  vars:
+    ansible_python_interpreter: /home/mahi/ansible-venv/bin/python
+
+  tasks:
+    - name: provision
+      ec2_instance:
+        name: myEC2
+        #key_name: "ec2.pem"
+        instance_type: t2.micro
+        image_id: ami-0c7217cdde317cfec
+        security_group: default
+        subnet_id: "subnet-04905087f090a904b"
+        region: us-east-1
+        state: present
+        wait: true
+      register: ec2
+      tags:
+        - create
+        - info
+
+    - name: information
+      debug:
+        msg: "{{ item.public_ip_address }}"
+      loop: "{{ ec2.instances }}"
+      tags: info
